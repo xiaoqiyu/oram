@@ -21,9 +21,26 @@ using namespace std;
 
 
 int main(int argc, const char * argv[]) {
-
-    cout<<"hello oram"<<endl;
-    //testOram();
+   
+    /*
+    multimap<int, int> mymap;
+    mymap.insert(pair<int, int>(1, 2));
+    mymap.insert(pair<int, int>(2, 3));
+    mymap.insert(pair<int,  int>(1,4));
+    
+    pair<multimap<int, int>::iterator, multimap<int, int>::iterator> ret = mymap.equal_range(3);
+    multimap<int, int>::iterator it;
+    if(ret.second == mymap.end()){
+        cout<<"it is end"<<endl;
+    }
+    if(ret.first == ret.second){
+        cout<<"equal"<<endl;
+    }
+    mymap.erase(1);
+    cout<<mymap.size()<<endl;
+     */
+     
+    testOram();
     //testOram2Tree();
     //testPathOram();
     return 0;

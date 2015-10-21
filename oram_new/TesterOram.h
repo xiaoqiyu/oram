@@ -39,8 +39,7 @@ void testOram(){
         for(long long j = 0; j < ACCESSTIME; ++j){
             //cout<<"Flush:"<<j << "//"<<LEAFNUM<<endl;
             long long flushPath = rand()%LEAFNUM+1;
-            oram.accessAndFlush(FLUSHNUM, flushPath);
-            //oram.getPathAndFlush(FLUSHNUM, flushPath);
+            //oram.accessAndFlush(FLUSHNUM, flushPath);
             long long stashSize = oram.getStashSize();
             if(stashSize > maxStash[i]){
                 maxStash[i] = stashSize;
@@ -48,8 +47,7 @@ void testOram(){
         }
         cout<<"stash size : "<<maxStash[i]<<endl;
     }
-    
-    //cout<<"max stash size:"<<endl;
+   
     vector<long long>::iterator iter;
     long long failTime = 0;
     long long thresHold = 3*logN*logN;
