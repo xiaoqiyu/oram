@@ -22,7 +22,7 @@ public:
     ~ORAM(){
         bt.deleteBt();
     }
-    void init(long long leafNum, int ns, long long ts, long long s, long long flushTime){
+    int init(long long leafNum, int ns, long long ts, long long s, long long flushTime){
         bt.init(leafNum, ns);
         trunkSize = ts;
         S = s;
@@ -35,14 +35,36 @@ public:
             //pm[i] = i * trunkSize;
             pm[i] = rand()%leafNum +1;
         }
+        
         vector<RangeTreeNode *> rtLst;
+        int isSuccess = 0;
+        
+        
         for(long long i = 0; i < leafNum; ++i){
-            accessAndFlush(1, i);
+           accessAndFlush(1, i);
             //getPathAndFlush(1, i);
-            
-            
         }
+        
+        //bt.printBt();
+        
+        /*
+        cout<<"********************line**************************"<<endl;
+        for(long long i = 0; i < leafNum; ++i){
+            long long trunkId = i / trunkSize;
+            long long tmppiId = pm[trunkId];
+            for(long long j = tmppiId; j <= tmppiId + S; j ++){
+                if(bt.writeToLeaf(tmppiId+j, i,  tmppiId) == 1){
+                    isSuccess = 1;
+                    break;
+                }
+            }
+        }
+        bt.printBt();
+         */
+        
+        return isSuccess;
     }
+    
     
     vector<RangeTreeNode*>  access(long long idx){
         long long trunkId = idx / trunkSize;
@@ -50,12 +72,11 @@ public:
         vector<RangeTreeNode *> retPaths;
         long long piId = pm[trunkId];
         long long newPath = rand()% bt.getLeafNum() + 1;
-        cout<<"access idx is: "<< idx<<"  access path is: "<<piId<< "new path is: "<<newPath<< endl;
+        //cout<<"access idx is: "<< idx<<"  access path is: "<<piId<< "new path is: "<<newPath<< endl;
         
         bool find = false;
         //cout<<"insert id: "<< idx<<"old trunk id: "<<piId<<"new trunk id is: "<<pm[trunkId]<< endl;
         
-        //
         multimap< long long, long long >::iterator it;
         it = stash.find(piId);
         
@@ -77,8 +98,6 @@ public:
         }
         
         
-        //
-        //cout<<"+++++++++++++++++++++++++++"<<endl;
         //printStash();
         if(find == false){
             retPaths = bt.getPI(piId, S);
@@ -88,7 +107,7 @@ public:
             pm[trunkId] = newPath;
             for(iter = retPaths.begin(); iter != retPaths.end(); ++iter){
                 tmpNode = (*iter)->treenode;
-                for(int i = 0; i < nodeSize * 2; i+=2){
+                for(int i = 0; i < tmpNode->val.size(); i+=2){
                     long long index = tmpNode -> val[i];
                     long long position = tmpNode -> val[i+1];
                     if(tmpNode->val[i] != dummy){
@@ -96,8 +115,12 @@ public:
                             find = true;
                             //pm[trunkId] = newPath;
                         }
-                        stash.insert(pair<long long, long long>(newPath, index));
-                        cout<<"insert stash(index, newpath): "<<index<<" "<<newPath<<endl;
+                        if((index/trunkSize) == trunkId ){
+                            stash.insert(pair<long long, long long>(newPath, index));
+                        }else{
+                            stash.insert(pair<long long, long long>(position, index));
+                        }
+                        //cout<<"insert stash(index, newpath): "<<index<<" "<<newPath<<endl;
                         tmpNode->val[i] = dummy;
                     }
                 }
@@ -107,7 +130,7 @@ public:
         //printStash();
         
         if(find == false){
-            cout<<"insert directly(idx, pos)"<<idx<< " "<< piId <<" "<<endl;
+            //cout<<"insert directly(idx, pos)"<<idx<< " "<< piId <<" "<<endl;
             stash.insert(pair<long long, long long>(pm[trunkId], idx));
         }
         //cout<<"stash size after access: "<<getStashSize()<<endl;
@@ -141,8 +164,8 @@ public:
             tmpNode = *iter;
             low  = tmpNode -> low;
             high = tmpNode -> high;
-            cout<<"before node size:++++++++++++++++++++++++++++++++++++++++++++++"<<endl;
-            for(int i = 0; i < nodeSize * 2; i += 2){
+            //cout<<"before node size:++++++++++++++++++++++++++++++++++++++++++++++"<<endl;
+            for(int i = 0; i < tmpNode->treenode->val.size(); i += 2){
                 randPath = rand()%(high - low + 1) + low;
                 //cout<<"random path is: "<<randPath<<endl;
                 if(tmpNode->treenode->val[i] == dummy){
@@ -160,7 +183,7 @@ public:
                      }
                      */
                     
-                    cout<<"low is, high is: "<<low <<" "<< high<<endl;
+                    //cout<<"low is, high is: "<<low <<" "<< high<<endl;
                     int count = 0;
                     multimap<long long, long long>::iterator iter = stash.begin();
                     iter = iter = stash.find(low);
@@ -171,17 +194,20 @@ public:
                         iter = stash.find(j);
                         j ++;
                         count ++;
-                        
+                
                     }
-                    cout << "while count its: "<<count <<" range is: "<< high - low <<endl;
+                    //cout << "while count its: "<<count <<" range is: "<< high - low <<endl;
                     
                     if(iter != stash.end()){
+                        //cout <<"find00000000000000000000000000000000000000"<<endl;
                         long long idx  = (*iter).second;
                         long long pos = (*iter).first;
-                        cout<<"write node: "<< idx<<" "<<pos<<endl;
+                        //cout<<"write node: "<< idx<<" "<<pos<<endl;
                         tmpNode->treenode->val[i] = idx;
                         tmpNode->treenode->val[i+1] = pos;
                         stash.erase(iter);
+                    }else{
+                        //cout<<"can not find111111111111111111111111111111111"<<endl;
                     }
                 }
             }
@@ -199,7 +225,7 @@ public:
         vector<RangeTreeNode *>::iterator iter;
         for(iter = retPaths.begin(); iter != retPaths.end(); ++iter){
             tmpNode = (*iter)->treenode;
-            for(int i = 0; i < nodeSize * 2; i+=2){
+            for(int i = 0; i < tmpNode->val.size(); i+=2){
                 long long index = tmpNode -> val[i];
                 long long position = tmpNode -> val[i+1];
                 if(tmpNode->val[i] != dummy){
@@ -226,11 +252,13 @@ public:
         long long initSize = getStashSize();
         vector<RangeTreeNode *> rtLst = access(idx);
         long long accessSize = getStashSize();
-        cout<<"before access: after access "<<initSize<<" "<<accessSize<< endl;
+
+        //cout<<"before access: after access "<<initSize<<" "<<accessSize<< endl;
         for(long long i = 0; i < flushTimes; ++i){
             flush(rtLst);
+            //cout<<"after flush: "<<i<<" "<<getStashSize()<<endl;
         }
-        cout<<"after flush: "<<getStashSize()<<endl;
+        
     }
     
     void getPathAndFlush(long long flushTimes, long long idx){
@@ -269,13 +297,12 @@ public:
                 vector<RangeTreeNode *>::iterator iter;
                 for(iter = retPaths.begin(); iter != retPaths.end(); ++iter){
                     tmpNode = (*iter)->treenode;
-                    for(int i = 0; i < nodeSize * 2; i+=2){
+                    for(int i = 0; i < tmpNode->val.size(); i+=2){
                         long long index = tmpNode -> val[i];
                         long long position = tmpNode -> val[i+1];
                         if(tmpNode->val[i] != dummy){
                             if(index == idx) {
                                 find = true;
-                                
                             }
                             stash.insert(pair<long long, long long>(newPath, index));
                             //cout<<"insert stash: "<<index<<" "<<position<<endl;

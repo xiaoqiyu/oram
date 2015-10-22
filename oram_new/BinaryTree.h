@@ -47,20 +47,26 @@ public:
         long long curNodeNum = 0;
         long long totalNodeNum = 2*lf - 1;
         leafNum = lf;
-        for(int i = 0;i < 2 * Z; ++ i){
+        nodeSize = Z;
+        for(int i = 0;i < 2 * 2 * nodeSize; ++ i){
             root->val.push_back(dummy);
         }
         curNodeNum ++;
         queue<TreeNode *> q;
         q.push(root);
+        
         while(!q.empty() && curNodeNum < totalNodeNum){
             TreeNode *cur = q.front();
             q.pop();
             TreeNode *leftChild = new TreeNode();
-            for(int i = 0; i < 2*Z; ++i){
-                leftChild->val.push_back(dummy);
-            }
             
+            if (curNodeNum <= 256){
+                //curNodeSize = 2*Z;
+                leftChild->val.resize(2*2*nodeSize, dummy);
+            }else{
+                leftChild->val.resize(2*nodeSize, dummy);
+            }
+
             curNodeNum ++;
             //if(curNodeNum >= leafNum ){
             //    leftChild->val[0] = curNodeNum - leafNum;
@@ -68,9 +74,14 @@ public:
             //}
             q.push(leftChild);
             TreeNode *rightChild = new TreeNode();
-            for(int i = 0; i < 2*Z; ++i){
-                rightChild->val.push_back(dummy);
+            
+            if (curNodeNum <= 256){
+                //curNodeSize = 2*Z;
+                rightChild->val.resize(2*2*nodeSize, dummy);
+            }else{
+                rightChild->val.resize(2*nodeSize, dummy);
             }
+         
             curNodeNum ++;
             //if(curNodeNum >= leafNum){
             //    rightChild->val[0] = curNodeNum - leafNum;
@@ -191,7 +202,7 @@ public:
                 }
             }
         }
-        cout<<"size is: "<< retPath.size()<<endl;
+        //cout<<"size is: "<< retPath.size()<<endl;
         return retPath;
     }
     
@@ -233,7 +244,26 @@ public:
         
     }
     
-    long long getLeafNum(){ return leafNum; }
+    long long getLeafNum(){
+        return leafNum;
+    }
+    
+    int writeToLeaf(long long leafId, long long idx, long long pos){
+        vector<TreeNode *> ret = getPath(leafId);
+        reverse(ret.begin(), ret.end());
+        int flag = 0;
+        TreeNode *leaf = ret[0];
+        for(int i = 0; i < leaf->val.size(); i+=2){
+            if(leaf->val[i] == dummy){
+                leaf->val[i] = idx;
+                leaf->val[i+1] = pos;
+                flag = 1;
+                break;
+            }
+        }
+        
+        return flag;
+    }
     
     void printBt(){
         TreeNode *tmpNode = root;
@@ -242,7 +272,10 @@ public:
         while(! q.empty()){
             tmpNode = q.front();
             q.pop();
-            cout<<tmpNode->val[0]<<endl;
+            for(int i = 0; i < tmpNode->val.size(); i++){
+                cout<<tmpNode->val[i]<<" ";
+            }
+            cout<<endl;
             if(tmpNode -> left != NULL)
             q.push(tmpNode -> left);
             if(tmpNode -> right != NULL)
@@ -253,6 +286,7 @@ public:
 private:
     TreeNode * root;
     long long leafNum;
+    int nodeSize;
 };
 
 
