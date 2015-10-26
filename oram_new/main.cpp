@@ -40,7 +40,7 @@ int main(int argc, const char * argv[]) {
     cout<<mymap.size()<<endl;
      */
     
-    cout<<"stable version"<<endl;
+    cout<<"stable version1"<<endl;
     testOram();
     //testOram2Tree();
     //testPathOram();
