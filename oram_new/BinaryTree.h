@@ -48,7 +48,7 @@ public:
         long long totalNodeNum = 2*lf - 1;
         leafNum = lf;
         nodeSize = Z;
-        for(int i = 0;i < 2 * 2 * nodeSize; ++ i){
+        for(int i = 0;i < 2 * 10 * nodeSize; ++ i){
             root->val.push_back(dummy);
         }
         curNodeNum ++;

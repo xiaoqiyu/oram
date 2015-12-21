@@ -164,7 +164,7 @@ public:
             tmpNode = *iter;
             low  = tmpNode -> low;
             high = tmpNode -> high;
-            //cout<<"before node size:++++++++++++++++++++++++++++++++++++++++++++++"<<endl;
+            //cout<<"before node size:++++++++++++++++++++++++++++++++++++++++++++"<<endl;
             for(int i = 0; i < tmpNode->treenode->val.size(); i += 2){
                 randPath = rand()%(high - low + 1) + low;
                 //cout<<"random path is: "<<randPath<<endl;
