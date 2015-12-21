@@ -11,9 +11,11 @@
 
 #include <stdio.h>
 #include <iostream>
+#include "COram.h"
 
 using namespace std;
 
 void testEncode();
+void testEvictPath();
 
 #endif /* defined(__oram_new__TesterCORAM__) */
